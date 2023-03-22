@@ -3,12 +3,6 @@
 :- op(600,xfy,^).
 :- op(500,fy,~).
 
-%semantica de los operadores
-v(X,Y) :- X;Y.
-^(X,Y) :- X,Y.
-~(X) :- \+ X.
- 
-
 % caso base si es una literal regresa la literal
 impl_free(X,X):-
     atom(X).
