@@ -7,7 +7,15 @@
 v(X,Y) :- X;Y.
 ^(X,Y) :- X,Y.
 ~(X) :- \+ X.
-=>(X,Y). 
+ 
+
+% caso base si es una literal regresa la literal
+impl_free(X,X):-
+    atom(X).
+
+% caso base si es una literal negada regresa la literal negada
+impl_free(~X,~X):-
+    atom(X).
 
 % llama recursivamente a implfree para cada argumento del and
 impl_free(X^Y,IMPLFREE):-
@@ -19,7 +27,43 @@ impl_free(X^Y,IMPLFREE):-
 impl_free(X=>Y,IMPLFREE):-
     impl_free(X,Izq),
     impl_free(Y,Der),
-    IMPLFREE=(~(Izq) v (Der)),!.
+    IMPLFREE=(~(Izq) | (Der)).
 
-impl_free(X,X).
-       %IMPLFREE=X.
+
+
+
+% caso base si es una literal regresa la literal
+nnf(X,X):-
+    atom(X).
+
+% caso base si es una literal regresa la literal
+nnf(~X,~X):-
+    atom(X).
+
+% elimina doble negación
+nnf(~(~X),X).
+
+% llama a nnf para el lado izquierdo y derecho y el resultado lo une con ^
+nnf(X^Y,NNF):-
+    nnf(X,Izq),
+    nnf(Y,Der),
+    NNF=((Izq)^(Der)).
+
+% llama a nnf para el lado izquierdo y derecho y el resultado lo une con v
+nnf(X|Y,NNF):-
+    nnf(X,Izq),
+    nnf(Y,Der),
+    NNF=((Izq) | (Der)).
+
+% llama a nnf para el lado izquierdo negado y derecho negado y el resultado lo une con ^
+nnf(~(X^Y),NNF):-
+    nnf(~X,Izq),
+    nnf(~Y,Der),
+    NNF=((Izq)|(Der)).
+
+% llama a nnf para el lado izquierdo y derecho y el resultado lo une con v
+nnf(~(X|Y),NNF):-
+    nnf(~X,Izq),
+    nnf(~Y,Der),
+    NNF=((Izq) ^ (Der)).
+
